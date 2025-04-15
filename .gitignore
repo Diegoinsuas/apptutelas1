@@ -1,0 +1,19 @@
+# Python __pycache__ y archivos compilados
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Archivos de base de datos
+*.db
+*.sqlite3
+
+# Entornos virtuales
+env/
+venv/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Configuración de VS Code
+.vscode/
