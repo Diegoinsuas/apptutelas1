@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS tutelas (
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS registro_control (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tipo_registro TEXT DEFAULT 1,
+    tipo_registro1 TEXT DEFAULT 1,
     tipo_doc_entidad TEXT NOT NULL,
     num_doc_entidad TEXT NOT NULL,
     fecha_inicio TEXT NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS registro_control (
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS caracterizacion_beneficiario (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tipo_registro TEXT DEFAULT 2,
+    tipo_registro2 TEXT DEFAULT 2,
     consecutivo INTEGER NOT NULL,
     tipo_doc_entidad TEXT NOT NULL,
     num_doc_entidad TEXT NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS caracterizacion_beneficiario (
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS datos_generales (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tipo_registro TEXT DEFAULT 3,
+    tipo_registro3 TEXT DEFAULT 3,
     consecutivo INTEGER NOT NULL,
     tipo_doc_entidad TEXT NOT NULL,
     num_doc_entidad TEXT NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS datos_generales (
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS problemas_juridicos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tipo_registro TEXT DEFAULT 4,
+    tipo_registro4 TEXT DEFAULT 4,
     consecutivo INTEGER NOT NULL,
     tipo_doc_entidad TEXT NOT NULL,
     num_doc_entidad TEXT NOT NULL,
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS problemas_juridicos (
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS causas_problemas_juridicos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tipo_registro TEXT DEFAULT 5,
+    tipo_registro5 TEXT DEFAULT 5,
     consecutivo INTEGER NOT NULL,
     tipo_doc_entidad TEXT NOT NULL,
     num_doc_entidad TEXT NOT NULL,
@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS causas_problemas_juridicos (
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS pretensiones_tutelas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tipo_registro TEXT DEFAULT 6,
+    tipo_registro6 TEXT DEFAULT 6,
     consecutivo INTEGER NOT NULL,
     tipo_doc_entidad TEXT NOT NULL,
     num_doc_entidad TEXT NOT NULL,

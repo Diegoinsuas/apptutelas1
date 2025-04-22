@@ -12,7 +12,7 @@ def mostrar_tablas(db):
         cursor.execute(f"PRAGMA table_info({tabla[0]})")
         columnas = cursor.fetchall()
         for col in columnas:
-            print(f"  {col[1]} ({col[2]})")
+            print(f"  {col[1]} ({col[2]}) ({col[3]})")
 
     conn.close()
 

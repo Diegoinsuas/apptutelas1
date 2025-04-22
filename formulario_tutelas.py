@@ -62,6 +62,14 @@ class registro_tutelas:
             return False
 
         return True
+    def obtener_consecutivo(self):
+        """Obtiene el último consecutivo registrado en la base de datos y lo incrementa."""
+        conn = self.conectar()
+        cursor = conn.cursor()
+        cursor.execute("SELECT MAX(consecutivo) FROM caracterizacion_beneficiario")
+        ultimo_consecutivo = cursor.fetchone()[0]
+        conn.close()
+        return (ultimo_consecutivo or 0) + 1
 
     def guardar_tutela(self):
         print("Guardando tutela...")
@@ -77,7 +85,7 @@ class registro_tutelas:
             # TIPO 1: REGISTRO CONTROL
             cursor.execute("""
                 INSERT INTO registro_control (
-                tipo_registro,
+                tipo_registro1,
                 tipo_doc_entidad,
                 num_doc_entidad,
                 fecha_inicio,
@@ -96,7 +104,7 @@ class registro_tutelas:
             # TIPO 2: CARACTERIZACIÓN BENEFICIARIO
             cursor.execute("""
                 INSERT INTO caracterizacion_beneficiario (
-                tipo_registro,
+                tipo_registro2,
                 consecutivo,
                 tipo_doc_entidad,
                 num_doc_entidad,
@@ -139,11 +147,12 @@ class registro_tutelas:
                 v["municipio_residencia"].get(),
                 v["indicador_actualizacion"].get()
                 ))
+            consecutivo += 1
 
             # TIPO 3: DATOS GENERALES
             cursor.execute("""
                 INSERT INTO datos_generales(
-                tipo_registro,
+                tipo_registro3,
                 consecutivo,
                 tipo_doc_entidad,
                 num_doc_entidad,
@@ -174,11 +183,12 @@ class registro_tutelas:
                 v["incidente_desacato"].get(),
                 v["indicador_actualizacion"].get()
                 ))
+            consecutivo += 1
 
             # TIPO 4: PROBLEMAS JURÍDICOS
             cursor.execute("""
                 INSERT INTO problemas_juridicos(
-                tipo_registro,
+                tipo_registro4,
                 consecutivo,
                 tipo_doc_entidad,
                 num_doc_entidad,
@@ -213,11 +223,12 @@ class registro_tutelas:
                 v["dia_enf_huerfana"].get(),
                 v["indicador_actualizacion"].get()
                 ))
+            consecutivo += 1
 
             # TIPO 5: CAUSAS DEL PROBLEMA JURÍDICO
             cursor.execute("""
                 INSERT INTO causas_problemas_juridicos(
-                tipo_registro,
+                tipo_registro5,
                 consecutivo,
                 tipo_doc_entidad,
                 num_doc_entidad,
@@ -240,11 +251,12 @@ class registro_tutelas:
                 v["cod_causa_tutela"].get(),
                 v["indicador_actualizacion"].get()
                 ))
+            consecutivo += 1
 
             # TIPO 6: PRETENSIONES
             cursor.execute("""
                 INSERT INTO pretensiones_tutelas(
-                tipo_registro,
+                tipo_registro6,
                 consecutivo,
                 tipo_doc_entidad,
                 num_doc_entidad,

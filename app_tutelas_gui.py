@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import pandas as pd
 from formulario_tutelas import registro_tutelas
+from ver_tutelas import ver_tutela
 
 
 # Función para conectarse a la base de datos
@@ -35,7 +36,7 @@ def mostrar_menu_principal():
 
     tk.Label(menu, text="Menú Principal", font=("Helvetica", 16)).pack(pady=10)
     tk.Button(menu, text="Registrar nueva tutela", width=30, command=formulario_tutela).pack(pady=5)
-    tk.Button(menu, text="Ver tutelas registradas", width=30, command=ver_tutelas).pack(pady=5)
+    tk.Button(menu, text="Ver tutelas registradas", width=30, command=ver_tutelas_regis).pack(pady=5)
     tk.Button(menu, text="Exportar tutelas a Excel", width=30, command=exportar_tutelas_excel).pack(pady=5)
     tk.Button(menu, text="Salir", width=30, command=menu.destroy).pack(pady=5)
 
@@ -44,61 +45,10 @@ def formulario_tutela():
     ventana = tk.Toplevel()
     registro_tutelas(ventana)
 
-# Ver tutelas
-def ver_tutelas():
-    def cargar_tutelas(documento=None):
-        for i in tree.get_children():
-            tree.delete(i)
-
-        conn = conectar()
-        cursor = conn.cursor()
-
-        if documento:
-            cursor.execute("""
-                SELECT cb.consecutivo, cb.tipo_doc_beneficiario, cb.num_doc_beneficiario,
-                    cb.nombre, cb.apellido, dg.num_radicacion, dg.fecha_radicado
-                FROM caracterizacion_beneficiario cb
-                JOIN datos_generales dg ON cb.consecutivo = dg.consecutivo
-                WHERE cb.num_doc_beneficiario = ?
-                ORDER BY cb.consecutivo DESC
-            """, (documento,))
-        else:
-            cursor.execute("""
-                SELECT cb.consecutivo, cb.tipo_doc_beneficiario, cb.num_doc_beneficiario,
-                    cb.nombre, cb.apellido, dg.num_radicacion, dg.fecha_radicado
-                FROM caracterizacion_beneficiario cb
-                JOIN datos_generales dg ON cb.consecutivo = dg.consecutivo
-                ORDER BY cb.consecutivo DESC
-            """)
-        
-        registros = cursor.fetchall()
-        conn.close()
-
-        for row in registros:
-            tree.insert("", "end", values=row)
-
-    # Ventana
+# Ver tutelas registradas
+def ver_tutelas_regis():
     ventana = tk.Toplevel()
-    ventana.title("Tutelas registradas")
-
-    # Campo de filtro
-    filtro_frame = tk.Frame(ventana)
-    filtro_frame.pack(padx=10, pady=5, fill="x")
-
-    tk.Label(filtro_frame, text="Número de documento:").pack(side="left")
-    entry_filtro = tk.Entry(filtro_frame)
-    entry_filtro.pack(side="left", padx=5)
-
-    tk.Button(filtro_frame, text="Buscar", command=lambda: cargar_tutelas(entry_filtro.get())).pack(side="left", padx=5)
-    tk.Button(filtro_frame, text="Ver Todos", command=lambda: cargar_tutelas()).pack(side="left", padx=5)
-
-    # Tabla
-    tree = ttk.Treeview(ventana, columns=("consec", "tipo_doc", "num_doc", "nombre", "apellido", "radicado", "fecha"), show="headings")
-    for col in ("consec", "tipo_doc", "num_doc", "nombre", "apellido", "radicado", "fecha"):
-        tree.heading(col, text=col.capitalize())
-    tree.pack(fill="both", expand=True, padx=10, pady=10)
-
-    cargar_tutelas()  # mostrar todos al abrir
+    ver_tutela(ventana)
 
 # Exportar a Excel
 def exportar_tutelas_excel():
