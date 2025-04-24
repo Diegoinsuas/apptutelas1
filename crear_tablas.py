@@ -12,20 +12,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
 )
 ''')
 
-# Tabla principal de tutelas
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS tutelas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    usuario_id INTEGER NOT NULL,
-    fecha_creacion TEXT DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
-)
-''')
-
 # Tipo 1: Registro de control
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS registro_control (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
     tipo_registro1 TEXT DEFAULT 1,
     tipo_doc_entidad TEXT NOT NULL,
     num_doc_entidad TEXT NOT NULL,
@@ -38,7 +27,6 @@ CREATE TABLE IF NOT EXISTS registro_control (
 # Tipo 2: Caracterización del beneficiario
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS caracterizacion_beneficiario (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
     tipo_registro2 TEXT DEFAULT 2,
     consecutivo INTEGER NOT NULL,
     tipo_doc_entidad TEXT NOT NULL,
@@ -65,7 +53,6 @@ CREATE TABLE IF NOT EXISTS caracterizacion_beneficiario (
 # Tipo 3: Datos generales
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS datos_generales (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
     tipo_registro3 TEXT DEFAULT 3,
     consecutivo INTEGER NOT NULL,
     tipo_doc_entidad TEXT NOT NULL,
@@ -86,7 +73,6 @@ CREATE TABLE IF NOT EXISTS datos_generales (
 # Tipo 4: Problemas jurídicos
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS problemas_juridicos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
     tipo_registro4 TEXT DEFAULT 4,
     consecutivo INTEGER NOT NULL,
     tipo_doc_entidad TEXT NOT NULL,
@@ -109,7 +95,6 @@ CREATE TABLE IF NOT EXISTS problemas_juridicos (
 # Tipo 5: Causas asociadas a problemas jurídicos
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS causas_problemas_juridicos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
     tipo_registro5 TEXT DEFAULT 5,
     consecutivo INTEGER NOT NULL,
     tipo_doc_entidad TEXT NOT NULL,
@@ -126,7 +111,6 @@ CREATE TABLE IF NOT EXISTS causas_problemas_juridicos (
 # Tipo 6: Pretensiones asociadas a las causas
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS pretensiones_tutelas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
     tipo_registro6 TEXT DEFAULT 6,
     consecutivo INTEGER NOT NULL,
     tipo_doc_entidad TEXT NOT NULL,
