@@ -48,94 +48,72 @@ class registro_tutelas:
     def conectar(self):
         return sqlite3.connect(self.db)
 
-    def validar_fecha(self, fecha_str):
-        try:
-            datetime.strptime(fecha_str, "%Y-%m-%d")
-            return True
-        except ValueError:
-            return False
-
     def validar_campos_completos(self):
-        from datetime import datetime
+        errores = []
 
-        campos_requeridos = list(self.variables.values())
-        campos_invalidos = []
+        def validar(var, etiqueta, tipo="texto", obligatorio=True):
+            valor = self.variables[var].get().strip()
+            for tab in self.notebook.winfo_children():
+                for frame in tab.winfo_children():
+                    for widget in frame.winfo_children():
+                        if isinstance(widget, tk.Entry) and widget.cget("textvariable") == str(self.variables[var]):
+                            widget.configure(bg="white")
+                            if obligatorio and not valor:
+                                errores.append(f"El campo '{etiqueta}' es obligatorio.")
+                                widget.configure(bg="#FFCCCC")
+                            elif valor and tipo == "fecha":
+                                try:
+                                    datetime.strptime(valor, "%Y-%m-%d")
+                                except ValueError:
+                                    errores.append(f"El campo '{etiqueta}' tiene un formato de fecha inválido (AAAA-MM-DD).")
+                                    widget.configure(bg="#FFCCCC")
 
-        for var in campos_requeridos:
-            valor = var.get().strip()
-            if valor == "":
-                campos_invalidos.append(var)
+        validar("municipio_tutela", "Municipio tutela")
+        validar("migrante", "Migrante")
+        validar("num_radicacion", "Número radicado")
+        validar("fecha_radicado", "Fecha radicado", tipo="fecha")
+        validar("decision_primera", "Decisión 1ra instancia")
+        validar("impugnacion", "Impugnación")
+        validar("incidente_desacato", "Incidente desacato")
+        validar("tipo_doc_beneficiario", "Tipo documento Beneficiario")
+        validar("num_doc_beneficiario", "Número documento Beneficiario")
+        validar("nombre", "Nombre")
+        validar("apellido", "Apellido")
+        validar("pais_origen", "País origen")
+        validar("regimen_afiliacion", "Régimen de Afiliación")
+        validar("fecha_nacimiento", "Fecha nacimiento", tipo="fecha")
+        validar("sexo", "Sexo")
+        validar("tipo_afiliado", "Tipo de afiliado")
+        validar("municipio_residencia", "Municipio de residencia")
+        validar("cod_problema_juridico", "Código problema jurídico")
+        validar("indicador_actualizacion", "Indicador actualización")
+        validar("gestacion", "Gestación")
+        validar("etnia", "Etnia")
+        validar("poblacion_especial", "Población especial")
+        validar("causa_demora", "Causa demora")
+        validar("desc_demora", "Descripción demora")
+        validar("desc_negacion", "Descripción negación")
+        validar("dia_principal", "Diagnóstico principal")
+        validar("cod_causa_tutela", "Código causa tutela")
+        validar("cod_pretension", "Código pretensión")
+        # Opcionales
+        validar("decision_segunda", "Decisión 2da instancia", obligatorio=False)
+        validar("fuente_financiacion", "Fuente financiación", obligatorio=False)
+        validar("dia_relacionado", "Diagnóstico relacionado", obligatorio=False)
+        validar("dia_enf_huerfana", "Diagnóstico enfermedad huérfana", obligatorio=False)
 
-        # Validar que las fechas sean correctas
-        fechas = ["fecha_nacimiento", "fecha_radicado"]
-        for fecha in fechas:
-            valor = self.variables[fecha].get().strip()
-            try:
-                datetime.strptime(valor, "%Y-%m-%d")
-            except ValueError:
-                campos_invalidos.append(self.variables[fecha])
 
-        if campos_invalidos:
-            messagebox.showerror("Error", "Hay campos vacíos o fechas inválidas. Por favor revisa todos los campos.")
+        if errores:
+            messagebox.showerror("Errores en el formulario", "\n".join(errores))
             return False
 
         return True
-    def contar_tutelas_existentes(self):
-        """Cuenta cuántas tutelas han sido registradas (usando la tabla tipo 2)."""
-        conn = self.conectar()
-        cursor = conn.cursor()
-        try:
-            cursor.execute("SELECT  COUNT(*) FROM caracterizacion_beneficiario")
-            total = cursor.fetchone()[0]
-            return total
-        except Exception as e:
-            messagebox.showerror("Error", f"No se pudo contar las tutelas: {e}")
-            return 0
-        finally:
-            conn.close()
-
-    def obtener_consecutivo(self):
-        """Obtiene el último consecutivo global de todas las tablas y lo incrementa."""
-        conn = self.conectar()
-        cursor = conn.cursor()
-        tablas = [
-            "caracterizacion_beneficiario",
-            "datos_generales",
-            "problemas_juridicos",
-            "causas_problemas_juridicos",
-            "pretensiones_tutelas"
-        ]
-        try:
-            maximos = []
-            for tabla in tablas:
-                cursor.execute(f"SELECT MAX(consecutivo) FROM {tabla}")
-                valor = cursor.fetchone()[0]
-                if valor is not None:
-                    maximos.append(valor)
-            ultimo = max(maximos) if maximos else 0
-            return ultimo + 1
-        except Exception as e:
-            messagebox.showerror("Error", f"Error al obtener el consecutivo: {e}")
-            return None
-        finally:
-            conn.close()
 
     def guardar_tutela(self):
         print("Guardando tutela...")
 
         if not self.validar_campos_completos():
             return
-
-        # Calcular consecutivos verticales por tipo
-        total_tutelas = self.contar_tutelas_existentes()
-        nuevo_id = total_tutelas + 1  # Tutela que se está registrando ahora
-
-        consecutivo_tipo2 = nuevo_id
-        consecutivo_tipo3 = nuevo_id + total_tutelas
-        consecutivo_tipo4 = nuevo_id + total_tutelas * 2
-        consecutivo_tipo5 = nuevo_id + total_tutelas * 3
-        consecutivo_tipo6 = nuevo_id + total_tutelas * 4
-
 
         v = self.variables
 
@@ -211,7 +189,7 @@ class registro_tutelas:
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 "2",
-                consecutivo_tipo2,
+                "1",
                 "NI",
                 self.NIT,
                 v["tipo_doc_beneficiario"].get(),
@@ -252,7 +230,7 @@ class registro_tutelas:
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 "3",
-                consecutivo_tipo3,
+                "1",
                 "NI",
                 self.NIT,
                 v["tipo_doc_beneficiario"].get(),
@@ -289,7 +267,7 @@ class registro_tutelas:
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 "4",
-                consecutivo_tipo4,
+                "1",
                 "NI",
                 self.NIT,
                 v["tipo_doc_beneficiario"].get(),
@@ -322,7 +300,7 @@ class registro_tutelas:
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 "5",
-                consecutivo_tipo5,
+                "1",
                 "NI",
                 self.NIT,
                 v["tipo_doc_beneficiario"].get(),
@@ -350,7 +328,7 @@ class registro_tutelas:
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 "6",
-                consecutivo_tipo6,
+                "1",
                 "NI",
                 self.NIT,
                 v["tipo_doc_beneficiario"].get(),
@@ -399,7 +377,7 @@ class registro_tutelas:
         tk.Label(entidad_frame, text="Tipo documento Entidad: NI", font=("Arial", 10)).grid(row=0, column=0, sticky="w", padx=10, pady=2)
         tk.Label(entidad_frame, text="Número documento Entidad: 900876345", font=("Arial", 10)).grid(row=1, column=0, sticky="w", padx=10, pady=2)
         tk.Label(entidad_frame, text="Código de habilitación: 7300102831", font=("Arial", 10)).grid(row=2, column=0, sticky="w", padx=10, pady=2)
-    
+        
         # ---- AGRUPAR CAMPOS EN BLOQUES VISUALES ----
         tutela_frame = tk.LabelFrame(self.tab_tutela, text="Datos Generales de la Tutela", padx=10, pady=5, font=("Arial", 10, "bold"))
         tutela_frame.grid(row=2, column=0, sticky="nsew", padx=10, pady=(10, 10))
@@ -409,7 +387,9 @@ class registro_tutelas:
 
         juridico_frame = tk.LabelFrame(self.tab_juridica, text="Información Jurídica", padx=10, pady=5, font=("Arial", 10, "bold"))
         juridico_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=(10, 10))
-    
+        
+        tk.Label(self.root, text="⚠ RECUERDE LLENAR TODO EN MAYÚSCULAS", font=("Arial", 15, "bold"), fg="red").pack(pady=20)
+
         # ---- CAMPOS ----
         add("Municipio tutela", "municipio_tutela", tutela_frame, False, "Código DIVIPOLA según manual")
         add("Número radicado", "num_radicacion", tutela_frame, False, "Número sin puntos, comas o espacios")
