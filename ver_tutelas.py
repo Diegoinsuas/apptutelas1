@@ -29,11 +29,12 @@ class VerTutelas:
         boton_frame = tk.Frame(self.ventana)
         boton_frame.pack(pady=10)
 
-        tk.Button(boton_frame, text="Ver Tutelas", width=20, command=self.cargar_datos).pack(side="left", padx=10)
-        tk.Button(boton_frame, text="Actualizar Consecutivos", width=30, command=self.actualizar_consecutivos).pack(side="left", padx=10)
-        tk.Button(boton_frame, text="Exportar tutelas a txt", width=30, command=self.exportar_tutelas_txt).pack(side="left", padx=10)
-        tk.Button(boton_frame, text="Reiniciar Base de Datos", width=30, command=self.reiniciar_base_datos).pack(side="left", padx=10)
-        tk.Button(boton_frame, text="Respaldar Base de Datos", width=30, command=self.respaldar_base_datos).pack(side="left", padx=10)
+        tk.Button(boton_frame, text="Ver Tutelas", width=10, command=self.cargar_datos).pack(side="left", padx=10)
+        tk.Button(boton_frame, text="Actualizar Consecutivos", width=20, command=self.actualizar_consecutivos).pack(side="left", padx=10)
+        tk.Button(boton_frame, text="Exportar tutelas a txt", width=20, command=self.exportar_tutelas_txt).pack(side="left", padx=10)
+        tk.Button(boton_frame, text="Respaldar Base de Datos", width=25, command=self.respaldar_base_datos).pack(side="left", padx=10)
+        tk.Button(boton_frame, text="Eliminar Tutela", width=20, command=self.eliminar_tutela, bg="red", fg="white").pack(side="left", padx=10)
+        tk.Button(boton_frame, text="Reiniciar Base de Datos", width=25, bg="red", command=self.reiniciar_base_datos, fg="white").pack(side="left", padx=10)
         
     def conectar(self):
         """Conexión a la base de datos."""
@@ -198,7 +199,7 @@ class VerTutelas:
         if not messagebox.askyesno("Confirmar", "¿Estás seguro de que deseas borrar todos los datos de las tutelas? Esta acción no se puede deshacer."):
             return
 
-        try:    
+        try:
             conn = self.conectar()
             cursor = conn.cursor()
 
@@ -242,7 +243,48 @@ class VerTutelas:
             messagebox.showinfo("Respaldo Exitoso", f"El respaldo se guardó correctamente en:\n{archivo_respaldo}")
         except Exception as e:
             messagebox.showerror("Error", f"Ocurrió un error al crear el respaldo:\n{e}")
+    def eliminar_tutela(self):
+        """Elimina un registro de tutela utilizando el número de radicado."""
+        # Solicitar el número de radicado al usuario
+        num_radicado = self.simple_input_popup("Eliminar Tutela", "Ingrese el número de radicado:")
+        if not num_radicado:
+            return  # El usuario canceló la operación
 
+        conn = self.conectar()
+        if not conn:
+            return
+        cursor = conn.cursor()
+
+        try:
+            # Verificar si el registro existe
+            cursor.execute("SELECT * FROM datos_generales WHERE num_radicacion = ?", (num_radicado,))
+            registro = cursor.fetchone()
+
+            if not registro:
+                tk.messagebox.showwarning("No encontrado", f"No se encontró un registro con el número de radicado: {num_radicado}")
+                return
+
+            # Eliminar el registro de todas las tablas relacionadas
+            tablas = [
+                "caracterizacion_beneficiario",
+                "datos_generales",
+                "problemas_juridicos",
+                "causas_problemas_juridicos",
+                "pretensiones_tutelas"
+            ]
+            for tabla in tablas:
+                cursor.execute(f"DELETE FROM {tabla} WHERE num_radicacion = ?", (num_radicado,))
+
+            conn.commit()
+            tk.messagebox.showinfo("Éxito", f"El registro con número de radicado {num_radicado} ha sido eliminado.")
+
+            # Refrescar la vista
+            self.cargar_datos()
+
+        except Exception as e:
+            tk.messagebox.showerror("Error", f"Ocurrió un error al eliminar el registro:\n{e}")
+        finally:
+            conn.close()
 # Ejecutar ventana
 if __name__ == "__main__":
     root = tk.Tk()

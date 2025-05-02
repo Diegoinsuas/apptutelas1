@@ -1,4 +1,5 @@
 import sqlite3
+import bcrypt
 
 conn = sqlite3.connect('tutelas.db')
 cursor = conn.cursor()
@@ -6,11 +7,15 @@ cursor = conn.cursor()
 # Tabla de Usuarios
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS usuarios (
-    nombre_admin TEXT NOT NULL,
+    username TEXT NOT NULL,
     usuario TEXT UNIQUE NOT NULL,
     contraseña TEXT NOT NULL
 )
 ''')
+
+# Crear un usuario por defecto
+contraseña_admin = bcrypt.hashpw("101012".encode('utf-8'), bcrypt.gensalt())
+cursor.execute("INSERT OR IGNORE INTO usuarios (username, usuario, contraseña) VALUES (?, ?, ?)", ("Administrador", "admin", contraseña_admin))
 
 # Tipo 1: Registro de control
 cursor.execute('''

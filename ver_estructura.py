@@ -1,19 +1,18 @@
 import sqlite3
 
-def mostrar_tablas(db):
+def mostrar_usuarios(db):
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
 
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-    tablas = cursor.fetchall()
+    # Consultar todos los registros de la tabla usuarios
+    cursor.execute("SELECT * FROM usuarios")
+    usuarios = cursor.fetchall()
 
-    for tabla in tablas:
-        print(f"\nTabla: {tabla[0]}")
-        cursor.execute(f"PRAGMA table_info({tabla[0]})")
-        columnas = cursor.fetchall()
-        for col in columnas:
-            print(f"  {col[1]} ({col[2]}) ({col[3]})")
+    print("\nTabla: usuarios")
+    for usuario in usuarios:
+        print(usuario)
 
     conn.close()
 
-mostrar_tablas("tutelas.db")
+# Llamar a la función para mostrar los usuarios
+mostrar_usuarios("tutelas.db")

@@ -4,8 +4,8 @@ from tkinter import ttk, messagebox
 import pandas as pd
 from formulario_tutelas import registro_tutelas
 from ver_tutelas import VerTutelas
-
-
+from gestion_usuarios import Login
+import bcrypt
 
 # Función para conectarse a la base de datos
 def conectar():
@@ -18,13 +18,14 @@ def verificar_login():
 
     conn = conectar()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM usuarios WHERE usuario = ? AND contraseña = ?", (usuario, contraseña))
+    cursor.execute("SELECT username, contraseña FROM usuarios WHERE usuario = ?", (usuario,))
     user = cursor.fetchone()
     conn.close()
 
-    if user:
-        nombre_admin = user[0]
-        messagebox.showinfo("Login exitoso", f"Bienvenido, {nombre_admin}!")
+    # Verificar si el usuario existe y la contraseña es correcta
+    if user and bcrypt.checkpw(contraseña.encode('utf-8'), user[1]):
+        username = user[0]
+        messagebox.showinfo("Login exitoso", f"Bienvenido, {username}!")
         ventana_login.destroy()
         mostrar_menu_principal()
     else:
@@ -38,6 +39,7 @@ def mostrar_menu_principal():
     tk.Label(menu, text="Menú Principal", font=("Helvetica", 16)).pack(pady=10)
     tk.Button(menu, text="Registrar nueva tutela", width=30, command=formulario_tutela).pack(pady=5)
     tk.Button(menu, text="Ver tutelas registradas", width=30, command=ver_tutelas_regis).pack(pady=5)
+    tk.Button(menu, text="Gestión de Usuarios", width=30, command=abrir_gestion_usuarios).pack(pady=5)
     tk.Button(menu, text="Salir", width=30, command=menu.destroy).pack(pady=5)
 
 # Registro de tutela
@@ -49,6 +51,12 @@ def formulario_tutela():
 def ver_tutelas_regis():
     ventana = tk.Toplevel()
     VerTutelas(ventana)
+
+# Gestión de usuarios
+def abrir_gestion_usuarios():
+    """Abre la ventana de inicio de sesión para la gestión de usuarios."""
+    root = tk.Toplevel()
+    Login(root)
 
 # Ventana de Login
 ventana_login = tk.Tk()

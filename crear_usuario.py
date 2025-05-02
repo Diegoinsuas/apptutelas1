@@ -1,7 +1,7 @@
 import sqlite3
 
 def crear_usuario():
-    nombre_admin = input("Nombre completo: ")
+    username = input("Nombre completo: ")
     usuario = input("Nombre de usuario: ")
     contraseña = input("Contraseña: ")
 
@@ -10,9 +10,9 @@ def crear_usuario():
 
     try:
         cursor.execute('''
-            INSERT INTO usuarios (nombre_admin, usuario, contraseña)
+            INSERT INTO usuarios (username, usuario, contraseña)
             VALUES (?, ?, ?)
-        ''', (nombre_admin, usuario, contraseña))
+        ''', (username, usuario, contraseña))
 
         conn.commit()
         print("✅ Usuario creado con éxito.")
