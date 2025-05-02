@@ -17,3 +17,4 @@ Thumbs.db
 
 # Configuración de VS Code
 .vscode/
+".env"

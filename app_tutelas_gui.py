@@ -23,7 +23,7 @@ def verificar_login():
     conn.close()
 
     # Verificar si el usuario existe y la contraseña es correcta
-    if user and bcrypt.checkpw(contraseña.encode('utf-8'), user[1]):
+    if user and bcrypt.checkpw(contraseña.encode('utf-8'), user[1].encode('utf-8') if isinstance(user[1], str) else user[1]):
         username = user[0]
         messagebox.showinfo("Login exitoso", f"Bienvenido, {username}!")
         ventana_login.destroy()
@@ -40,7 +40,6 @@ def mostrar_menu_principal():
     tk.Button(menu, text="Registrar nueva tutela", width=30, command=formulario_tutela).pack(pady=5)
     tk.Button(menu, text="Ver tutelas registradas", width=30, command=ver_tutelas_regis).pack(pady=5)
     tk.Button(menu, text="Gestión de Usuarios", width=30, command=abrir_gestion_usuarios).pack(pady=5)
-    tk.Button(menu, text="Salir", width=30, command=menu.destroy).pack(pady=5)
 
 # Registro de tutela
 def formulario_tutela():

@@ -433,7 +433,7 @@ class registro_tutelas:
     def abrir_guia(self):
         try:
             # Ruta del archivo de la guía
-            guia_path = "manual_2025.pdf"
+            guia_path = os.path.join(os.getcwd(), "recursos", "manual_2025.pdf")
             os.startfile(guia_path)
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo abrir el archivo de la guía.\n{e}")

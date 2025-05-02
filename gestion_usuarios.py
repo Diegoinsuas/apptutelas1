@@ -67,6 +67,13 @@ class GestionUsuarios:
         """Elimina un usuario de la base de datos."""
         username = self.entry_username.get()
 
+        # Lista de usuarios protegidos
+        usuarios_protegidos = ["admin", "Administrador"]
+
+        if username in usuarios_protegidos:
+            messagebox.showwarning("Acción Restringida", f"No se puede eliminar el usuario protegido '{username}'.")
+            return
+
         if not username:
             messagebox.showwarning("Campo Vacío", "Por favor, ingresa el nombre de usuario.")
             return
