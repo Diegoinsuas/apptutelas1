@@ -3,9 +3,16 @@ from tkinter import messagebox
 import sqlite3
 import bcrypt
 from dotenv import load_dotenv
-import os
+import os, sys
 
-load_dotenv() 
+def resource_path(relative_path):
+    """Obtiene la ruta absoluta del recurso, compatible con PyInstaller."""
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
+env_path = resource_path(".env")
+load_dotenv(env_path)
 
 class GestionUsuarios:
     def __init__(self, root):

@@ -54,7 +54,7 @@ class VerTutelas:
         # Consultas organizadas por tipo de registro
         consultas = {
             "1": "SELECT * FROM registro_control",
-            "2": "SELECT * FROM caracterizacion_beneficiario",
+            "2": "SELECT tipo_registro2, consecutivo, tipo_doc_entidad, num_doc_entidad, tipo_doc_beneficiario, num_doc_beneficiario, nombre, apellido, pais_origen, migrante, regimen_afiliacion, cod_habilitacion, fecha_nacimiento, sexo, gestacion, etnia, poblacion_especial, tipo_afiliado, municipio_residencia, indicador_actualizacion FROM caracterizacion_beneficiario",
             "3": "SELECT * FROM datos_generales",
             "4": "SELECT * FROM problemas_juridicos",
             "5": "SELECT * FROM causas_problemas_juridicos",
@@ -123,7 +123,7 @@ class VerTutelas:
             conn.close()
 
     def exportar_tutelas_txt(self):
-        """Exporta los datos de las tutelas a un archivo TXT sin pedir semestre."""
+        """Exporta los datos de las tutelas a un archivo TXT."""
         nit_entidad = "000900876345"
 
         conn = self.conectar()
@@ -154,14 +154,14 @@ class VerTutelas:
             # Consultas organizadas por tipo de registro
             consultas = {
                 "1": "SELECT * FROM registro_control",
-                "2": "SELECT * FROM caracterizacion_beneficiario",
+                "2": "SELECT tipo_registro2, consecutivo, tipo_doc_entidad, num_doc_entidad, tipo_doc_beneficiario, num_doc_beneficiario, nombre, apellido, pais_origen, migrante, regimen_afiliacion, cod_habilitacion, fecha_nacimiento, sexo, gestacion, etnia, poblacion_especial, tipo_afiliado, municipio_residencia, indicador_actualizacion FROM caracterizacion_beneficiario",
                 "3": "SELECT * FROM datos_generales",
                 "4": "SELECT * FROM problemas_juridicos",
                 "5": "SELECT * FROM causas_problemas_juridicos",
                 "6": "SELECT * FROM pretensiones_tutelas"
             }
 
-            with open(nombre_archivo, "w", encoding="utf-8") as archivo:
+            with open(archivo_destino, "w", encoding="utf-8") as archivo:
                 for tipo, consulta in consultas.items():
                     cursor.execute(consulta)
                     registros = cursor.fetchall()
@@ -243,6 +243,7 @@ class VerTutelas:
             messagebox.showinfo("Respaldo Exitoso", f"El respaldo se guardó correctamente en:\n{archivo_respaldo}")
         except Exception as e:
             messagebox.showerror("Error", f"Ocurrió un error al crear el respaldo:\n{e}")
+            
     def eliminar_tutela(self):
         """Elimina un registro de tutela utilizando el número de radicado."""
         # Solicitar el número de radicado al usuario
@@ -252,19 +253,12 @@ class VerTutelas:
 
         conn = self.conectar()
         if not conn:
+            tk.messagebox.showerror("Error", "No se pudo conectar a la base de datos.")
             return
         cursor = conn.cursor()
 
         try:
-            # Verificar si el registro existe
-            cursor.execute("SELECT * FROM datos_generales WHERE num_radicacion = ?", (num_radicado,))
-            registro = cursor.fetchone()
-
-            if not registro:
-                tk.messagebox.showwarning("No encontrado", f"No se encontró un registro con el número de radicado: {num_radicado}")
-                return
-
-            # Eliminar el registro de todas las tablas relacionadas
+            # Verificar si el registro existe en alguna tabla
             tablas = [
                 "caracterizacion_beneficiario",
                 "datos_generales",
@@ -272,6 +266,19 @@ class VerTutelas:
                 "causas_problemas_juridicos",
                 "pretensiones_tutelas"
             ]
+
+            registro_encontrado = False
+            for tabla in tablas:
+                cursor.execute(f"SELECT * FROM {tabla} WHERE num_radicacion = ?", (num_radicado,))
+                if cursor.fetchone():
+                    registro_encontrado = True
+                    break
+
+            if not registro_encontrado:
+                tk.messagebox.showwarning("No encontrado", f"No se encontró un registro con el número de radicado: {num_radicado}")
+                return
+
+            # Eliminar el registro de todas las tablas relacionadas
             for tabla in tablas:
                 cursor.execute(f"DELETE FROM {tabla} WHERE num_radicacion = ?", (num_radicado,))
 
@@ -281,10 +288,13 @@ class VerTutelas:
             # Refrescar la vista
             self.cargar_datos()
 
+        except sqlite3.Error as e:
+            tk.messagebox.showerror("Error de base de datos", f"Ocurrió un error al interactuar con la base de datos:\n{e}")
         except Exception as e:
-            tk.messagebox.showerror("Error", f"Ocurrió un error al eliminar el registro:\n{e}")
+            tk.messagebox.showerror("Error", f"Ocurrió un error inesperado:\n{e}")
         finally:
             conn.close()
+
 # Ejecutar ventana
 if __name__ == "__main__":
     root = tk.Tk()

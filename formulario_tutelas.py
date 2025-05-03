@@ -2,6 +2,13 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 import sqlite3, os
 from datetime import datetime
+import sys, os
+
+def resource_path(relative_path):
+        """Obtiene la ruta absoluta del recurso, compatible con PyInstaller."""
+        if hasattr(sys, '_MEIPASS'):
+            return os.path.join(sys._MEIPASS, relative_path)
+        return os.path.join(os.path.abspath("."), relative_path)
 
 class registro_tutelas:
     def __init__(self, root):
@@ -433,7 +440,7 @@ class registro_tutelas:
     def abrir_guia(self):
         try:
             # Ruta del archivo de la guía
-            guia_path = os.path.join(os.getcwd(), "recursos", "manual_2025.pdf")
+            guia_path = resource_path("recursos/manual_2025.pdf") 
             os.startfile(guia_path)
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo abrir el archivo de la guía.\n{e}")

@@ -5,11 +5,19 @@ import pandas as pd
 from formulario_tutelas import registro_tutelas
 from ver_tutelas import VerTutelas
 from gestion_usuarios import Login
-import bcrypt
+import bcrypt, sys, os
 
 # Función para conectarse a la base de datos
 def conectar():
-    return sqlite3.connect('tutelas.db')
+    db_path = resource_path("tutelas.db")
+    return sqlite3.connect(db_path)
+
+# Obtener la ruta base del ejecutable o del script
+def resource_path(relative_path):
+    """Obtiene la ruta absoluta del recurso, compatible con PyInstaller."""
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 # Función de login
 def verificar_login():

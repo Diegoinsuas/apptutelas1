@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS caracterizacion_beneficiario (
     tipo_afiliado TEXT NOT NULL,
     municipio_residencia TEXT NOT NULL,
     indicador_actualizacion TEXT NOT NULL
+    num_radicacion TEXT NOT NULL,
 )
 ''')
 
